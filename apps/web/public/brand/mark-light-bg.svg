@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="SWU TCC">
+  <path d="M32 4 56.25 18v28L32 60 7.75 46V18Z" stroke="#0F0F17" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M19 26 32 17l13 9" stroke="#6247E0" stroke-width="5" stroke-linejoin="miter"/>
+  <path d="M19 35 32 26l13 9" stroke="#6247E0" stroke-width="5" stroke-linejoin="miter"/>
+  <path d="M7.75 41h48.5" stroke="#D98A00" stroke-width="2.5"/>
+  <path d="M24 53 32 47l8 6" stroke="#BDBAD2" stroke-width="4" stroke-linejoin="miter"/>
+</svg>

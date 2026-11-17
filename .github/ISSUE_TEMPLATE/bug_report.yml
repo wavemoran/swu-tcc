@@ -1,0 +1,41 @@
+name: Bug report
+description: A wrong verdict, a tournament that will not load, or something broken on the site.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping. To report a security problem, use "Report a vulnerability" on the Security tab instead.
+  - type: input
+    id: tournament
+    attributes:
+      label: Melee.gg tournament link
+      description: The link you pasted into SWU TCC, if the problem involves a tournament.
+  - type: input
+    id: player
+    attributes:
+      label: Player
+      description: The player you were looking at, and which round the event was in.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+      description: For a wrong verdict, say what actually happened in the event if you know.
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Device and browser
+      placeholder: iPhone 16, Safari
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots (optional)
+      description: Drag and drop images here.

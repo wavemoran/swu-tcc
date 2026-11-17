@@ -1,0 +1,30 @@
+name: Release
+
+# release-please keeps a "Release PR" open on main (version bump plus
+# CHANGELOG.md). Merging it creates the vX.Y.Z tag and the GitHub Release.
+# Deploying to Cloudflare is a separate workflow, added once the account is
+# connected.
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  release-please:
+    name: Release PR / tag
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: write       # create the release tag and update CHANGELOG.md
+      pull-requests: write  # open and update the Release PR
+    steps:
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          token: ${{ github.token }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json

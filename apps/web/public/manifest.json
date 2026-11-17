@@ -1,0 +1,12 @@
+{
+  "name": "SWU TCC · Top Cut Calculator",
+  "short_name": "SWU TCC",
+  "description": "Can I make top cut, and can I safely intentionally draw (ID)?",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#08080D",
+  "theme_color": "#08080D",
+  "icons": [
+    { "src": "/app-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

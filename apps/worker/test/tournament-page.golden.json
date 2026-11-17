@@ -1,0 +1,667 @@
+{
+ "464438": {
+  "name": "Van&#39;s Homeworlds Planetary Qualifier",
+  "startDate": "2026-11-15T17:00:00.0000000Z",
+  "statusText": "Ended | 26 of 128 Enrolled Players",
+  "rounds": [
+   {
+    "id": 1649423,
+    "name": "Round 1",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1649424,
+    "name": "Round 2",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1649425,
+    "name": "Round 3",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1649426,
+    "name": "Round 4",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1649427,
+    "name": "Round 5",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1649428,
+    "name": "Quarterfinals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   },
+   {
+    "id": 1649429,
+    "name": "Semifinals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   },
+   {
+    "id": 1649430,
+    "name": "Finals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   }
+  ]
+ },
+ "465966": {
+  "name": "PLANETARY QUALIFIER @ Tabletop Village",
+  "startDate": "2026-11-15T20:00:00.0000000Z",
+  "statusText": "Ended | 63 of 128 Enrolled Players",
+  "rounds": [
+   {
+    "id": 1655263,
+    "name": "Round 1",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1655264,
+    "name": "Round 2",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1655265,
+    "name": "Round 3",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1655266,
+    "name": "Round 4",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1655267,
+    "name": "Round 5",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1810116,
+    "name": "Round 6",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1655268,
+    "name": "Quarterfinals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   },
+   {
+    "id": 1655269,
+    "name": "Semifinals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   },
+   {
+    "id": 1655270,
+    "name": "Finals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   }
+  ]
+ },
+ "484355": {
+  "name": "Homeworlds Planetary Qualifier",
+  "startDate": "2026-11-14T10:00:00.0000000Z",
+  "statusText": "Ended | 33 of 128 Enrolled Players",
+  "rounds": [
+   {
+    "id": 1724636,
+    "name": "Round 1",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1724637,
+    "name": "Round 2",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1724638,
+    "name": "Round 3",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1724639,
+    "name": "Round 4",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1724640,
+    "name": "Round 5",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1806815,
+    "name": "Round 6",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1724641,
+    "name": "Quarterfinals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   },
+   {
+    "id": 1724642,
+    "name": "Semifinals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   },
+   {
+    "id": 1724643,
+    "name": "Finals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   }
+  ]
+ },
+ "484511": {
+  "name": "Star Wars: Unlimited — Homeworlds Planetary Qualifier",
+  "startDate": "2026-11-14T18:00:00.0000000Z",
+  "statusText": "Ended | 52 of 88 Enrolled Players",
+  "rounds": [
+   {
+    "id": 1725211,
+    "name": "Round 1",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1725212,
+    "name": "Round 2",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1725213,
+    "name": "Round 3",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1725214,
+    "name": "Round 4",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1725215,
+    "name": "Round 5",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1749836,
+    "name": "Round 6",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1725216,
+    "name": "Quarterfinals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   },
+   {
+    "id": 1725217,
+    "name": "Semifinals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   },
+   {
+    "id": 1725218,
+    "name": "Finals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   }
+  ]
+ },
+ "493469": {
+  "name": "Cardbastion PQ",
+  "startDate": "2026-11-15T16:00:00.0000000Z",
+  "statusText": "Ended | 12 of 40 Enrolled Players",
+  "rounds": [
+   {
+    "id": 1758369,
+    "name": "Round 1",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1758370,
+    "name": "Round 2",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1758371,
+    "name": "Round 3",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1758372,
+    "name": "Round 4",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1810303,
+    "name": "Quarterfinals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   },
+   {
+    "id": 1810304,
+    "name": "Semifinals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   },
+   {
+    "id": 1810305,
+    "name": "Finals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   }
+  ]
+ },
+ "498211": {
+  "name": "Sector Qualifier Baltimore Play Event - Saturday - 10:00 am",
+  "startDate": "2026-11-07T15:00:00.0000000Z",
+  "statusText": "Ended | 484 of 512 Enrolled Players",
+  "rounds": [
+   {
+    "id": 1775592,
+    "name": "Round 1",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1775593,
+    "name": "Round 2",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1775594,
+    "name": "Round 3",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1775595,
+    "name": "Round 4",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1775596,
+    "name": "Round 5",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1775597,
+    "name": "Round 6",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1775598,
+    "name": "Round 7",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1775599,
+    "name": "Round 8",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1775600,
+    "name": "Round 9",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1775601,
+    "name": "Round 10",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1775602,
+    "name": "Round 11",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1775603,
+    "name": "Round 12",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1775604,
+    "name": "Quarterfinals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   },
+   {
+    "id": 1775605,
+    "name": "Semifinals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   },
+   {
+    "id": 1775606,
+    "name": "Finals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   }
+  ]
+ },
+ "504384": {
+  "name": "Planetary Qualifier Enroque - 14-11-26",
+  "startDate": "2026-11-14T12:30:00.0000000Z",
+  "statusText": "Ended | 69 of 78 Enrolled Players",
+  "rounds": [
+   {
+    "id": 1798472,
+    "name": "Round 1",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1798473,
+    "name": "Round 2",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1798474,
+    "name": "Round 3",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1798475,
+    "name": "Round 4",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1798476,
+    "name": "Round 5",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1807059,
+    "name": "Round 6",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1807060,
+    "name": "Round 7",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1798477,
+    "name": "Quarterfinals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   },
+   {
+    "id": 1798478,
+    "name": "Semifinals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   },
+   {
+    "id": 1798479,
+    "name": "Finals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   }
+  ]
+ },
+ "504989": {
+  "name": "Planetary Qualifier - Royaume du TCG X Ludotrotter Lille",
+  "startDate": "2026-11-15T08:00:00.0000000Z",
+  "statusText": "Ended | 70 of 128 Enrolled Players",
+  "rounds": [
+   {
+    "id": 1800765,
+    "name": "Round 1",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1800766,
+    "name": "Round 2",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1800767,
+    "name": "Round 3",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1800768,
+    "name": "Round 4",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1800769,
+    "name": "Round 5",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1809101,
+    "name": "Round 6",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1809102,
+    "name": "Round 7",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1800770,
+    "name": "Quarterfinals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   },
+   {
+    "id": 1800771,
+    "name": "Semifinals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   },
+   {
+    "id": 1800772,
+    "name": "Finals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   }
+  ]
+ },
+ "505142": {
+  "name": "CBG 11/14 SWU Homeworlds Planetary Qualifier Sealed Event - Tustin, CA",
+  "startDate": "2026-11-14T17:00:00.0000000Z",
+  "statusText": "Ended | 64 of 64 Enrolled Players",
+  "rounds": [
+   {
+    "id": 1801318,
+    "name": "Round 1",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1801319,
+    "name": "Round 2",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1801320,
+    "name": "Round 3",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1801321,
+    "name": "Round 4",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1801322,
+    "name": "Round 5",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1801323,
+    "name": "Round 6",
+    "started": true,
+    "completed": true,
+    "kind": "swiss"
+   },
+   {
+    "id": 1801435,
+    "name": "Quarterfinals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   },
+   {
+    "id": 1801436,
+    "name": "Semifinals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   },
+   {
+    "id": 1801437,
+    "name": "Finals",
+    "started": true,
+    "completed": true,
+    "kind": "playoff"
+   }
+  ]
+ }
+}

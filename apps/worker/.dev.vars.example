@@ -1,0 +1,5 @@
+# Copy to .dev.vars (git-ignored) for `wrangler dev`. Real values live in 1Password.
+# Only used when MELEE_SOURCE is "api". For production use `wrangler secret put`.
+MELEE_SOURCE=site
+MELEE_CLIENT_ID=
+MELEE_CLIENT_SECRET=

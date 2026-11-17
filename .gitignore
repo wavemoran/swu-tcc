@@ -1,0 +1,19 @@
+node_modules/
+dist/
+coverage/
+.wrangler/
+.dev.vars
+*.local
+.DS_Store
+*.tsbuildinfo
+.claude/scheduled_tasks.lock
+.claude/settings.local.json
+.claude/worktrees/
+
+# e2e artifacts
+e2e/screenshots/
+e2e/test-results/
+e2e/playwright-report/
+
+# raw official-API captures hold real player data (see fixtures/README.md)
+fixtures/melee-api/

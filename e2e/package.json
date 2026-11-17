@@ -1,0 +1,17 @@
+{
+  "name": "@swu-tcc/e2e",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Playwright end-to-end tests against the real stack and a local fake Melee.gg.",
+  "type": "module",
+  "scripts": {
+    "e2e": "playwright test",
+    "fake-melee": "node fake-melee/server.ts",
+    "typecheck": "tsc -p ."
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.65.0",
+    "@types/node": "^26.6.6"
+  }
+}

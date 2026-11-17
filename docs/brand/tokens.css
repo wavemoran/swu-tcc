@@ -1,0 +1,108 @@
+/* SWU TCC — design tokens. Dark ("Holotable") is the default; light ("Daylight Hall") is for bright venues. */
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  /* Surfaces */
+  --tcc-bg:        #08080D; /* void */
+  --tcc-surface:   #0F0F17; /* hull */
+  --tcc-panel:     #171724; /* raised panel */
+  --tcc-line:      #262636; /* hairline borders */
+  --tcc-line-strong:#3A3A52;
+
+  /* Text */
+  --tcc-text:      #ECEBF5;
+  --tcc-text-muted:#9A98B3;
+  --tcc-text-faint:#807E9C; /* min for small text, 4.5:1 on surface */
+
+  /* Brand */
+  --tcc-primary:      #A08CFF; /* holo violet — actions, links, focus */
+  --tcc-primary-ink:  #0E0820; /* text on primary */
+  --tcc-primary-soft: rgba(160,140,255, .12);
+  --tcc-cut:          #FFB547; /* THE CUT LINE — amber, reserved for the cut */
+  --tcc-cut-soft:     rgba(255, 181, 71, .12);
+
+  /* Qualification status (always paired with an icon + label) */
+  --tcc-lock:     #3DDC97; /* LOCKED — in even with a loss */
+  --tcc-idsafe:   #A08CFF; /* ID SAFE — a draw qualifies */
+  --tcc-bubble:   #FFB547; /* BUBBLE — tiebreakers decide */
+  --tcc-mustwin:  #FF7A59; /* WIN & IN — must win */
+  --tcc-out:      #807E9C; /* OUT — cannot make cut */
+
+  /* Game aspects (deck tags only — never for status) */
+  --tcc-aspect-vigilance:  #3B82F6;
+  --tcc-aspect-command:    #22C55E;
+  --tcc-aspect-aggression: #EF4444;
+  --tcc-aspect-cunning:    #EAB308;
+  --tcc-aspect-heroism:    #F1F5F9;
+  --tcc-aspect-villainy:   #111827;
+
+  /* Type */
+  --tcc-font-display: 'Chakra Petch', 'Rajdhani', system-ui, sans-serif;
+  --tcc-font-body:    'Inter', system-ui, -apple-system, sans-serif;
+  --tcc-font-mono:    'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  --tcc-text-xs:   12px;  /* micro labels, uppercase + 0.12em tracking */
+  --tcc-text-sm:   14px;
+  --tcc-text-md:   16px;  /* body */
+  --tcc-text-lg:   20px;
+  --tcc-text-xl:   28px;  /* section titles */
+  --tcc-text-2xl:  40px;  /* page titles */
+  --tcc-text-hero: 72px;  /* the verdict percentage */
+
+  /* Space (4px base) */
+  --tcc-space-1: 4px;  --tcc-space-2: 8px;  --tcc-space-3: 12px; --tcc-space-4: 16px;
+  --tcc-space-5: 24px; --tcc-space-6: 32px; --tcc-space-7: 48px; --tcc-space-8: 64px;
+
+  /* Shape */
+  --tcc-radius-sm: 2px;
+  --tcc-radius-md: 4px;
+  --tcc-radius-pill: 999px;
+  --tcc-chamfer: 10px; /* clipped corner on hero/verdict panels */
+  --tcc-tap: 44px;     /* min touch target */
+
+  /* Effects */
+  --tcc-glow-primary: 0 0 0 1px rgba(160,140,255,.5), 0 0 24px rgba(160,140,255,.25);
+  --tcc-glow-cut:     0 0 16px rgba(255,181,71,.35);
+  --tcc-focus-ring:   0 0 0 2px var(--tcc-bg), 0 0 0 4px var(--tcc-primary);
+  --tcc-ease: cubic-bezier(.2, .8, .2, 1);
+  --tcc-dur:  160ms;
+}
+
+/* Light theme */
+:root[data-theme="light"] {
+  --tcc-bg: #F6F5FB; --tcc-surface: #FFFFFF; --tcc-panel: #EEEDF6;
+  --tcc-line: #DAD8E8; --tcc-line-strong: #BDBAD2;
+  --tcc-text: #0F0F17; --tcc-text-muted: #4D4B66; --tcc-text-faint: #615F7C;
+  --tcc-primary: #6247E0; --tcc-primary-ink: #FFFFFF; --tcc-primary-soft: rgba(98,71,224,.10);
+  --tcc-cut: #D98A00; --tcc-cut-soft: rgba(217,138,0,.12);
+  --tcc-lock: #0B7F50; --tcc-idsafe: #6247E0; --tcc-bubble: #A15C00; --tcc-mustwin: #C2410C; --tcc-out: #615F7C;
+  --tcc-glow-primary: 0 0 0 1px rgba(98,71,224,.4);
+  --tcc-glow-cut: none;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --tcc-bg: #F6F5FB; --tcc-surface: #FFFFFF; --tcc-panel: #EEEDF6;
+    --tcc-line: #DAD8E8; --tcc-line-strong: #BDBAD2;
+    --tcc-text: #0F0F17; --tcc-text-muted: #4D4B66; --tcc-text-faint: #615F7C;
+    --tcc-primary: #6247E0; --tcc-primary-ink: #FFFFFF; --tcc-primary-soft: rgba(98,71,224,.10);
+    --tcc-cut: #D98A00; --tcc-cut-soft: rgba(217,138,0,.12);
+    --tcc-lock: #0B7F50; --tcc-idsafe: #6247E0; --tcc-bubble: #A15C00; --tcc-mustwin: #C2410C; --tcc-out: #615F7C;
+    --tcc-glow-primary: 0 0 0 1px rgba(98,71,224,.4);
+    --tcc-glow-cut: none;
+  }
+}
+
+/* Signature utilities */
+.tcc-cut-line {               /* the dashed amber rule drawn at the cut position in standings */
+  height: 0; border-top: 2px dashed var(--tcc-cut);
+  box-shadow: var(--tcc-glow-cut);
+}
+.tcc-chamfer {                /* clipped top-right + bottom-left corners for hero panels */
+  clip-path: polygon(0 0, calc(100% - var(--tcc-chamfer)) 0, 100% var(--tcc-chamfer),
+                     100% 100%, var(--tcc-chamfer) 100%, 0 calc(100% - var(--tcc-chamfer)));
+}
+.tcc-label {                  /* micro label */
+  font: 500 var(--tcc-text-xs)/1.2 var(--tcc-font-mono);
+  text-transform: uppercase; letter-spacing: .12em; color: var(--tcc-text-muted);
+}
+.tcc-num { font-family: var(--tcc-font-mono); font-variant-numeric: tabular-nums; }

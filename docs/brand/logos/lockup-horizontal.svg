@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 72" fill="none" role="img" aria-label="SWU TCC — Top Cut Calculator">
+  <!-- Text uses Chakra Petch 700 + JetBrains Mono 500. Outline text to paths before using outside the web app. -->
+  <g transform="translate(4 4)">
+    <path d="M32 4 56.25 18v28L32 60 7.75 46V18Z" stroke="#ECEBF5" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M19 26 32 17l13 9" stroke="#A08CFF" stroke-width="5" stroke-linejoin="miter"/>
+    <path d="M19 35 32 26l13 9" stroke="#A08CFF" stroke-width="5" stroke-linejoin="miter"/>
+    <path d="M7.75 41h48.5" stroke="#FFB547" stroke-width="2.5"/>
+    <path d="M24 53 32 47l8 6" stroke="#3A3A52" stroke-width="4" stroke-linejoin="miter"/>
+  </g>
+  <text x="84" y="40" font-family="'Chakra Petch', sans-serif" font-weight="700" font-size="34" letter-spacing="2" fill="#ECEBF5">SWU <tspan fill="#A08CFF">TCC</tspan></text>
+  <text x="86" y="60" font-family="'JetBrains Mono', monospace" font-weight="500" font-size="10.5" letter-spacing="3" fill="#9A98B3">TOP CUT CALCULATOR</text>
+</svg>

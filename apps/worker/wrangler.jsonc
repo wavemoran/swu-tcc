@@ -1,0 +1,34 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "swu-tcc",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-01",
+  // Static files are served by Workers static assets (free, unmetered). Only /api/* runs the Worker.
+  "assets": {
+    "directory": "../web/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  // The only public URL. Cloudflare created the DNS record and certificate (zone swu-tcc.win,
+  // same account). workers.dev and per-version preview URLs are off so there is one address.
+  "routes": [{ "pattern": "swu-tcc.win", "custom_domain": true }],
+  "workers_dev": false,
+  "preview_urls": false,
+  // Workers Logs (free; on Free it stops ingesting at the daily cap and never bills). See docs/free-tier.md.
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "vars": {
+    // "1" turns every /api route into a 503 `disabled` response.
+    "TCC_DISABLED": "0",
+    // Upstream origin. Only https://melee.gg or an http://localhost:<port> / 127.0.0.1:<port> origin
+    // is accepted (anything else is a 500). E2E tests point it at a local fake Melee.
+    "MELEE_ORIGIN": "https://melee.gg",
+    // "site" (default): Melee's website endpoints. "api": the official credentialed API; needs the
+    // secrets MELEE_CLIENT_ID and MELEE_CLIENT_SECRET (`wrangler secret put`, never in this file).
+    // See docs/melee-api-switchover.md.
+    "MELEE_SOURCE": "site",
+    // User-Agent for site mode: "honest" (SWU-TCC/0.1) or "curl" (curl's default, curl/8.7.1).
+    // Every request also sends X-Client with our real identity. Owner decision; do not change.
+    "MELEE_USER_AGENT": "curl"
+  }
+}
