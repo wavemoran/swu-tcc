@@ -9,7 +9,7 @@ const VIEWPORTS = {
 for (const theme of ['dark', 'light'] as const) {
   for (const [vp, size] of Object.entries(VIEWPORTS)) {
     test.describe(`screenshots ${theme} ${vp}`, () => {
-      test.use({ theme, viewport: size, fonts: true });
+      test.use({ theme, viewport: size });
       const file = (name: string) => `screenshots/${name}-${vp}-${theme}.png`;
 
       test('landing', async ({ page }) => {

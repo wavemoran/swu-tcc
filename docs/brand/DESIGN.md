@@ -72,7 +72,7 @@ The six game aspects (Vigilance, Command, Aggression, Cunning, Heroism, Villainy
 | Numbers / labels / data | **JetBrains Mono** | 400, 500, 700 | `tabular-nums`; micro labels are 12px uppercase with 0.12em tracking |
 
 Scale (px): 12 · 14 · 16 · 20 · 28 · 40 · 72 (72 is reserved for the verdict percentage).
-All three fonts are open source from Google Fonts (OFL).
+All three fonts are open source (OFL-1.1) and self-hosted through Fontsource (`@fontsource-variable/inter`, `@fontsource-variable/jetbrains-mono`, `@fontsource/chakra-petch`); the site never loads Google Fonts. Inter and JetBrains Mono are variable fonts (family names `Inter Variable`, `JetBrains Mono Variable`).
 
 ## 4. Shape, space, depth
 

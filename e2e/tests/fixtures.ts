@@ -16,10 +16,8 @@ export type Theme = 'dark' | 'light';
 
 let ipCounter = 0;
 
-export const test = base.extend<{ theme: Theme; fonts: boolean }>({
+export const test = base.extend<{ theme: Theme }>({
   theme: ['dark', { option: true }],
-  // Google Fonts are blocked by default to keep runs hermetic; screenshots turn them on.
-  fonts: [false, { option: true }],
 
   // The worker rate-limits per cf-connecting-ip (60/min); give every test its own client address.
   extraHTTPHeaders: async ({}, use) => {
@@ -27,16 +25,17 @@ export const test = base.extend<{ theme: Theme; fonts: boolean }>({
     await use({ 'cf-connecting-ip': `10.1.${Math.floor(ipCounter / 250)}.${ipCounter % 250}` });
   },
 
-  page: async ({ page, theme, fonts }, use) => {
-    // Hard guard: tests must never reach the real Melee. Fonts are blocked to keep runs hermetic.
+  page: async ({ page, theme }, use) => {
+    // Hard guard: tests must never reach the real Melee. Fonts are self-hosted, so Google Fonts must never be requested either.
     const forbidden: string[] = [];
     await page.route(/^https?:\/\/([^/]*\.)?melee\.gg(\/|$)/, (route) => {
       forbidden.push(route.request().url());
       return route.abort();
     });
-    if (!fonts) {
-      await page.route(/^https:\/\/fonts\.(googleapis|gstatic)\.com\//, (route) => route.abort());
-    }
+    await page.route(/^https:\/\/fonts\.(googleapis|gstatic)\.com\//, (route) => {
+      forbidden.push(route.request().url());
+      return route.abort();
+    });
     await page.addInitScript((t) => {
       try {
         localStorage.setItem('swu-tcc:theme', t);
@@ -46,7 +45,7 @@ export const test = base.extend<{ theme: Theme; fonts: boolean }>({
     }, theme);
     await page.emulateMedia({ colorScheme: theme });
     await use(page);
-    expect(forbidden, 'requests to the real Melee.gg').toEqual([]);
+    expect(forbidden, 'requests to the real Melee.gg or Google Fonts').toEqual([]);
   },
 });
 

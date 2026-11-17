@@ -1,5 +1,5 @@
 /* SWU TCC — design tokens. Dark ("Holotable") is the default; light ("Daylight Hall") is for bright venues. */
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap');
+/* Fonts are self-hosted via Fontsource in apps/web/src/main.tsx (no Google Fonts). */
 
 :root {
   /* Surfaces */
@@ -38,8 +38,8 @@
 
   /* Type */
   --tcc-font-display: 'Chakra Petch', 'Rajdhani', system-ui, sans-serif;
-  --tcc-font-body:    'Inter', system-ui, -apple-system, sans-serif;
-  --tcc-font-mono:    'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+  --tcc-font-body:    'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
+  --tcc-font-mono:    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
 
   --tcc-text-xs:   12px;  /* micro labels, uppercase + 0.12em tracking */
   --tcc-text-sm:   14px;
