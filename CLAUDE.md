@@ -25,6 +25,7 @@ draw (ID)?*
 
 - **Cloudflare free tier only.** Read `docs/free-tier.md` before touching the worker. No KV/D1/R2/Durable Objects/Cron. Keep the worker's CPU work near zero.
 - **Be a good guest on Melee.gg.** Only the allowlisted endpoints, numeric IDs only, edge-cached, never crawl. `MELEE_USER_AGENT` is an owner decision: do not change it. Every request sends `X-Client` identifying us. Never use a browser User-Agent. If Melee asks us to stop, set `TCC_DISABLED=1`.
+- **Limit upstream fetches, not visitors.** Cache misses are capped per client and per location (Rate Limiting bindings, free); cached hits never are. A Cloudflare WAF rule (`docs/deploy.md`) handles floods. See `docs/free-tier.md`.
 - **Honest odds** (DESIGN.md rule 4): never show 100% unless proven by enumeration; always list assumptions.
 
 ## Commands

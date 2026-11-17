@@ -46,6 +46,21 @@ CLOUDFLARE_ACCOUNT_ID=… CLOUDFLARE_API_TOKEN=… npx wrangler deploy
 Never print the token. After any deploy, `npx wrangler tail swu-tcc --format json`
 shows live requests, CPU time and the structured `evt: api` log line.
 
+## WAF flood rule (owner, dashboard)
+
+Create once in the Cloudflare dashboard for the `swu-tcc.win` zone: Security -> WAF -> Rate limiting rules -> Create rule.
+
+| Field | Value |
+|---|---|
+| Expression | `starts_with(http.request.uri.path, "/api/")` |
+| Characteristics | IP |
+| Rate | 300 requests per 10 seconds |
+| Action | Block, for 10 seconds |
+
+Free plan allows 1 rule, IP-only counting, and a 10 s period and mitigation timeout. It stops floods before the
+Worker runs (so they do not use the 100k/day quota). Normal use is far below it because cached hits are cheap
+and the Worker's own limits apply to upstream fetches. See `docs/free-tier.md`.
+
 ## Emergency stop
 
 Set `TCC_DISABLED` to `"1"` (every `/api` route answers 503 `disabled`) and

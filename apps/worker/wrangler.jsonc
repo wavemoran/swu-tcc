@@ -19,6 +19,15 @@
   "preview_urls": false,
   // Workers Logs (free; on Free it stops ingesting at the daily cap and never bills). See docs/free-tier.md.
   "observability": { "enabled": true, "head_sampling_rate": 1 },
+  // Caps on UPSTREAM fetches to Melee (cache misses only; cached hits are never limited).
+  // Workers Rate Limiting binding, works on the Free plan; counts are per Cloudflare location and
+  // approximate. namespace_id is any positive integer string, unique in the account.
+  "ratelimits": [
+    // All clients together: at most 30 Melee requests per 10 s per location (key "melee").
+    { "name": "MELEE_LOCATION_LIMIT", "namespace_id": "1001", "simple": { "limit": 30, "period": 10 } },
+    // One client IP: at most 20 Melee requests per 60 s per location.
+    { "name": "MELEE_CLIENT_LIMIT", "namespace_id": "1002", "simple": { "limit": 20, "period": 60 } }
+  ],
   "vars": {
     // "1" turns every /api route into a 503 `disabled` response.
     "TCC_DISABLED": "0",

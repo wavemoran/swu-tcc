@@ -24,7 +24,7 @@ each is one more limit to track.
 ## Guardrails in code
 
 - `TCC_DISABLED=1` (a Worker variable) turns every `/api/*` route into a 503 `disabled` response: a kill switch that needs no code change.
-- A per-IP rate limit on `/api/*` (60 requests/minute), so one client cannot use up the daily allowance. It is a best-effort in-memory limiter, not the Rate Limiting binding; see below.
+- A loose per-IP backstop on `/api/*` (600 requests/minute, in memory) plus upstream limits on cache misses; see "Protecting Melee and our quota" below.
 - Upstream requests are only ever sent to `https://melee.gg`, with numeric IDs only (or, for local tests only, a loopback origin set with `MELEE_ORIGIN`): the four allowlisted site paths, or in `api` mode `/api/tournament/{id}`, `/api/standing/list/round/{id}` and `/api/match/list/round/{id}`.
 - `MELEE_SOURCE` (`site` default, or `api`) picks the upstream. In `api` mode the secrets `MELEE_CLIENT_ID` and `MELEE_CLIENT_SECRET` (Wrangler secrets, free; no extra plan or binding) are sent only as the Basic auth header to melee.gg and are never logged, cached or returned. See `docs/melee-api-switchover.md`.
 - API mode parses each page of JSON in the Worker to merge pages (site mode streams verbatim). That is small CPU work for a normal event (a few hundred rows); check CPU time in Metrics after switching. If it ever nears 10 ms, return the first page's bytes untouched when `hasMore` is false.
@@ -73,13 +73,26 @@ and CPU time. Workers & Pages → Plans shows the plan (should say Free).
 - **Workers Free limits** (https://developers.cloudflare.com/workers/platform/limits/): 100,000 requests/day (resets midnight UTC), 10 ms CPU per HTTP request, 50 subrequests per invocation (each redirect hop counts), Cache API 50 `put/match/delete` calls per request (shared with the subrequest quota), 512 MB Cache API object size, 64 MiB Worker size, 20,000 static asset files, 25 MiB per asset.
 - **Static assets are free and unlimited** (https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/): "Requests to static assets are free and unlimited." Exception: requests matching `run_worker_first` patterns always invoke the Worker and count as Worker requests. Free plan summary: https://developers.cloudflare.com/workers/platform/pricing/.
 - **Assets config** (https://developers.cloudflare.com/workers/static-assets/binding/): `assets.directory`, `binding`, `not_found_handling: "single-page-application"`, and `run_worker_first` as an array of patterns (supports `*` and `!` negation, max 100). Our `wrangler.jsonc` uses exactly these and `wrangler deploy --dry-run` accepts it.
-- **Rate Limiting binding** (https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/): configured as `ratelimits: [{ name, namespace_id, simple: { limit, period } }]` with `period` of 10 or 60 seconds, Wrangler 4.36+, counters are per Cloudflare location. **The docs pages we could read do not state whether it is available on the Free plan** (the limits, pricing and GA changelog pages are all silent). Because we cannot confirm it, and a binding that is unavailable could break deployment, the Worker does not use it. It uses a per-isolate in-memory fixed-window limiter (`apps/worker/src/ratelimit.ts`). Limitation: each isolate and location counts separately and state is lost on eviction, so it only curbs casual hammering. Real abuse protection is the edge cache (most requests never reach Melee), the 100k/day cap (which fails closed, never bills) and the `TCC_DISABLED` kill switch. Revisit if the binding is confirmed on Free.
+- **Rate Limiting binding** (https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/): configured as `ratelimits: [{ name, namespace_id, simple: { limit, period } }]` with `period` of 10 or 60 seconds, Wrangler 4.36+ (`delta` needs 4.157+), counters are per Cloudflare location and eventually consistent (approximate). **Confirmed to work on the Free plan on 2026-11-17 by a probe deploy.** The docs pages are silent on the plan, so that probe is the evidence.
+
+## Protecting Melee and our quota: the layers
+
+The goal is to limit **upstream fetches** (cache misses), not visitors. Players at one venue share an IP, and cached hits cost Melee nothing, so limiting cached traffic per IP only causes false positives. From outermost to innermost:
+
+1. **Cloudflare WAF rate limiting rule** (dashboard, see `docs/deploy.md`): blocks a flood of `/api/*` before the Worker runs, so it does not use the 100k/day quota.
+2. **Per-IP backstop** in the Worker: 600 requests/minute per IP per isolate, in memory. A pathology guard only, deliberately loose.
+3. **Edge cache**: tournament 60 s, live round 30 s, completed round 24 h. Cached hits are never limited.
+4. **Coalescing**: concurrent misses for the same key in one isolate share one upstream fetch and one limiter charge.
+5. **Upstream limits** (bindings `MELEE_CLIENT_LIMIT`: 20 Melee requests/60 s per client IP; `MELEE_LOCATION_LIMIT`: 30 Melee requests/10 s per location for everyone). Charged only on a cache miss, right before calling Melee; a tournament miss costs 2, a round miss 1. Refusals are 429 `rate_limited` with `retry-after` 60 (client) or 10 (location), never cached, and the web app does not retry them. When a binding is absent (unit tests, e2e) the Worker uses in-memory fixed-window limiters with the same numbers.
+6. **Not-found caching**: a Melee 404 is cached 10 minutes (only 404, never other errors), so a nonexistent id reaches Melee once per 10 minutes per location.
+7. **100k requests/day cap**: fails closed on Free, never bills.
+8. **Kill switch**: `TCC_DISABLED=1`.
 
 ## Load we put on Melee
 
 - Requests only happen when a visitor opens a tournament; there is no crawling, polling or prefetching.
 - A tournament with N rounds costs 2 + 2N upstream requests on a cold cache (about 20 for a 6-round event with a top 8), fetched four at a time.
 - Edge cache: tournament page 60 s, a live round 30 s, a completed round 24 h. Many players at one event share the cached copies (per Cloudflare location).
-- Per-visitor rate limit: 60 API requests per minute.
+- Upstream limits: 20 Melee requests per minute per client IP and 30 per 10 s per location (cache misses only).
 - Every request sends `X-Client: SWU-TCC/0.1 (+https://swu-tcc.win)`, and Cloudflare adds `CF-Worker: <our domain>` to Worker subrequests, so Melee can see who we are.
 - `TCC_DISABLED=1` stops all upstream traffic. Set it if Melee asks us to stop.

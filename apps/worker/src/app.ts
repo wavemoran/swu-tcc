@@ -15,7 +15,7 @@ import {
 import { userAgentFor } from './shared';
 import { ApiClient, credentialsFrom, roundBody } from './api';
 import { adaptTournamentDetails } from './apiAdapter';
-import { createLimiter, type Limiter } from './ratelimit';
+import { createLimiter, memoryBinding, type Limiter, type RateLimitBinding } from './ratelimit';
 
 export interface Env {
   TCC_DISABLED?: string;
@@ -30,8 +30,40 @@ export interface Env {
   MELEE_CLIENT_SECRET?: string;
   /** Staging only (set with `--var TCC_STAGING:1` on a staging deploy, never in wrangler.jsonc): enables `x-tcc-nocache`. */
   TCC_STAGING?: string;
+  /** Workers Rate Limiting bindings (wrangler.jsonc `ratelimits`). Optional: absent in tests/e2e, where in-memory limiters stand in. */
+  MELEE_LOCATION_LIMIT?: RateLimitBinding;
+  MELEE_CLIENT_LIMIT?: RateLimitBinding;
   ASSETS: Fetcher;
 }
+
+/** Limiters for upstream (cache-miss) fetches. Injectable so tests are deterministic. */
+export interface UpstreamLimits {
+  location: RateLimitBinding;
+  client: RateLimitBinding;
+}
+
+export const LOCATION_LIMIT = { limit: 30, windowMs: 10_000, retryAfter: 10 };
+export const CLIENT_LIMIT = { limit: 20, windowMs: 60_000, retryAfter: 60 };
+export const IP_BACKSTOP = { limit: 600, windowMs: 60_000 };
+/** How long a Melee not-found answer is cached. */
+export const TTL_NOT_FOUND = 600;
+
+/** Thrown inside the upstream path when a limiter refuses; turned into a 429 by onError. Never cached. */
+class UpstreamRefused extends Error {
+  retryAfter: number;
+  constructor(message: string, retryAfter: number) {
+    super(message);
+    this.retryAfter = retryAfter;
+  }
+}
+
+interface Buffered {
+  headers: [string, string][];
+  body: ArrayBuffer;
+}
+
+/** In-flight upstream fetches in this isolate, keyed by cache key URL. */
+const inflight = new Map<string, Promise<Buffered>>();
 
 export const TTL_TOURNAMENT = 60;
 export const TTL_ROUND_LIVE = 30;
@@ -103,7 +135,7 @@ function cacheKey(url: URL, withCompleted: boolean, source: Source): Request {
 
 /** Per-request facts for the structured log. Never holds IPs, headers or secrets. */
 export interface LogMeta {
-  cache: 'hit' | 'miss' | 'none';
+  cache: 'hit' | 'miss' | 'coalesced' | 'none';
   upstream: number | null;
 }
 
@@ -124,6 +156,8 @@ async function cached(
   key: Request,
   ttl: number,
   source: Source,
+  /** Runs right before the upstream fetch; throws UpstreamRefused to refuse. */
+  admit: () => Promise<void>,
   build: () => Promise<Response>,
   bypass = false,
 ): Promise<Response> {
@@ -133,23 +167,53 @@ async function cached(
     meta.cache = 'hit';
     return hit;
   }
+
+  const make = (b: Buffered): Response => {
+    const headers = new Headers(b.headers);
+    return new Response(b.body.slice(0), { status: 200, headers, encodeBody: headers.has('content-encoding') ? 'manual' : 'automatic' });
+  };
+
+  const waiting = bypass ? undefined : inflight.get(key.url);
+  if (waiting) {
+    meta.cache = 'coalesced';
+    return make(await waiting);
+  }
   meta.cache = 'miss';
 
-  const upstream = await build();
-  meta.upstream = 200;
-  const headers = new Headers(upstream.headers);
-  headers.set('cache-control', `public, max-age=${ttl}`);
-  headers.set('x-tcc-source', source);
-  if (!headers.has('x-tcc-fetched-at')) headers.set('x-tcc-fetched-at', new Date().toISOString());
-  // Pre-compressed bytes must not be encoded a second time.
-  const encodeBody = headers.has('content-encoding') ? 'manual' : 'automatic';
-  const res = new Response(upstream.body, { status: 200, headers, encodeBody });
-  if (!bypass) {
-    // A clone does not keep encodeBody: 'manual', so re-assert it or the compressed bytes get stored double-encoded.
-    const copy = res.clone();
-    ctx.waitUntil(cache.put(key, encodeBody === 'manual' ? new Response(copy.body, { status: 200, headers, encodeBody }) : copy));
-  }
-  return res;
+  const run = async (): Promise<Buffered> => {
+    await admit();
+    let upstream: Response;
+    try {
+      upstream = await build();
+    } catch (e) {
+      if (e instanceof UpstreamError && e.kind === 'not_found' && !bypass) {
+        // Remember "no such id" so a repeated lookup does not reach Melee again for a while.
+        const nf = fail('not_found', e.message, { 'cache-control': `public, max-age=${TTL_NOT_FOUND}` });
+        ctx.waitUntil(cache.put(key, nf));
+      }
+      throw e;
+    }
+    meta.upstream = 200;
+    const headers = new Headers(upstream.headers);
+    headers.set('cache-control', `public, max-age=${ttl}`);
+    headers.set('x-tcc-source', source);
+    if (!headers.has('x-tcc-fetched-at')) headers.set('x-tcc-fetched-at', new Date().toISOString());
+    const buffered: Buffered = { headers: [...headers], body: await upstream.arrayBuffer() };
+    if (!bypass) {
+      // A fresh Response with encodeBody: 'manual' for compressed bytes, or they get stored double-encoded.
+      ctx.waitUntil(cache.put(key, make(buffered)));
+    }
+    return buffered;
+  };
+
+  if (bypass) return make(await run());
+  const promise = run();
+  inflight.set(key.url, promise);
+  const clear = () => {
+    if (inflight.get(key.url) === promise) inflight.delete(key.url);
+  };
+  promise.then(clear, clear);
+  return make(await promise);
 }
 
 /** Measurement aid: honoured only when the staging var is on, so production config can never enable it. */
@@ -168,7 +232,29 @@ function passthrough(upstream: Response): Response {
   return new Response(upstream.body, { status: 200, headers, encodeBody: encoding ? 'manual' : 'automatic' });
 }
 
-export function createApp(limiter: Limiter = createLimiter(60, 60_000)) {
+export function createApp(
+  limiter: Limiter = createLimiter(IP_BACKSTOP.limit, IP_BACKSTOP.windowMs),
+  injected?: Partial<UpstreamLimits>,
+) {
+  // Fallbacks when the Rate Limiting bindings are not configured (unit tests, e2e, odd dev setups).
+  const fallback: UpstreamLimits = {
+    location: injected?.location ?? memoryBinding(LOCATION_LIMIT.limit, LOCATION_LIMIT.windowMs),
+    client: injected?.client ?? memoryBinding(CLIENT_LIMIT.limit, CLIENT_LIMIT.windowMs),
+  };
+
+  /** Charge `cost` Melee requests against the client, then the location. Throws UpstreamRefused. */
+  const admitFor = (env: Env, req: Request, cost: number) => async () => {
+    const ip = req.headers.get('cf-connecting-ip') ?? 'unknown';
+    const client = injected?.client ?? env.MELEE_CLIENT_LIMIT ?? fallback.client;
+    const location = injected?.location ?? env.MELEE_LOCATION_LIMIT ?? fallback.location;
+    if (!(await client.limit({ key: ip, delta: cost })).success) {
+      throw new UpstreamRefused("You've loaded a lot of new data in the last minute; wait a moment.", CLIENT_LIMIT.retryAfter);
+    }
+    if (!(await location.limit({ key: 'melee', delta: cost })).success) {
+      throw new UpstreamRefused('Lots of people are loading new data right now; try again in a few seconds.', LOCATION_LIMIT.retryAfter);
+    }
+  };
+
   const app = new Hono<{ Bindings: Env; Variables: { site: SiteUpstream; log: LogMeta } }>();
 
   // Structured request log (Workers Logs). Route kind, outcome, cache and timing only.
@@ -213,6 +299,9 @@ export function createApp(limiter: Limiter = createLimiter(60, 60_000)) {
   });
 
   app.onError((e, c) => {
+    if (e instanceof UpstreamRefused) {
+      return fail('rate_limited', e.message, { 'retry-after': String(e.retryAfter) });
+    }
     if (e instanceof UpstreamError) {
       const meta = c.get('log');
       if (meta) meta.upstream = e.upstreamStatus;
@@ -227,7 +316,7 @@ export function createApp(limiter: Limiter = createLimiter(60, 60_000)) {
     const up = upstreamFor(c.env);
     if ('error' in up) return up.error;
     const key = cacheKey(new URL(c.req.url), false, up.source);
-    return cached(c.get('log'), c.executionCtx, key, TTL_TOURNAMENT, up.source, async () => {
+    return cached(c.get('log'), c.executionCtx, key, TTL_TOURNAMENT, up.source, admitFor(c.env, c.req.raw, 2), async () => {
       let parts: Pick<ProxyTournament, 'name' | 'startDate' | 'statusText' | 'rounds' | 'standingsConfig'>;
       if (up.source === 'api') {
         // standingsConfig: the API has no equivalent; null makes core use CEG defaults (1/3 floor).
@@ -257,7 +346,7 @@ export function createApp(limiter: Limiter = createLimiter(60, 60_000)) {
       const up = upstreamFor(c.env);
       if ('error' in up) return up.error;
       const key = cacheKey(url, true, up.source);
-      return cached(c.get('log'), c.executionCtx, key, roundTtl(completed), up.source, async () => {
+      return cached(c.get('log'), c.executionCtx, key, roundTtl(completed), up.source, admitFor(c.env, c.req.raw, 1), async () => {
         if (up.source === 'api') {
           const paged = await (kind === 'standings' ? up.client.roundStandings(roundId) : up.client.roundMatches(roundId));
           return new Response(JSON.stringify(roundBody(paged)), {
