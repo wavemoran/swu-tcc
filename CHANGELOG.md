@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/wavemoran/swu-tcc/compare/v1.0.1...v1.1.0) (2026-11-17)
+
+
+### Features
+
+* **web:** self-host fonts instead of loading Google Fonts ([#9](https://github.com/wavemoran/swu-tcc/issues/9)) ([57c1321](https://github.com/wavemoran/swu-tcc/commit/57c1321da57b027e8dd9af9468be7e6c03451e42))
+
 ## [1.0.1](https://github.com/wavemoran/swu-tcc/compare/v1.0.0...v1.0.1) (2026-11-17)
 
 
