@@ -385,6 +385,7 @@ describe('x-tcc-nocache staging bypass', () => {
   });
   it('wrangler.jsonc does not define TCC_STAGING', async () => {
     expect(wranglerConfig).not.toContain('TCC_STAGING');
+    expect(wranglerConfig).not.toContain('TCC_NO_UPSTREAM_LIMITS');
   });
 });
 

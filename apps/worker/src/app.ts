@@ -33,6 +33,8 @@ export interface Env {
   /** Workers Rate Limiting bindings (wrangler.jsonc `ratelimits`). Optional: absent in tests/e2e, where in-memory limiters stand in. */
   MELEE_LOCATION_LIMIT?: RateLimitBinding;
   MELEE_CLIENT_LIMIT?: RateLimitBinding;
+  /** E2E only (`--var TCC_NO_UPSTREAM_LIMITS:1`, never in wrangler.jsonc): skip the upstream limits, since all e2e traffic shares one IP. */
+  TCC_NO_UPSTREAM_LIMITS?: string;
   ASSETS: Fetcher;
 }
 
@@ -244,6 +246,7 @@ export function createApp(
 
   /** Charge `cost` Melee requests against the client, then the location. Throws UpstreamRefused. */
   const admitFor = (env: Env, req: Request, cost: number) => async () => {
+    if (env.TCC_NO_UPSTREAM_LIMITS === '1') return;
     const ip = req.headers.get('cf-connecting-ip') ?? 'unknown';
     const client = injected?.client ?? env.MELEE_CLIENT_LIMIT ?? fallback.client;
     const location = injected?.location ?? env.MELEE_LOCATION_LIMIT ?? fallback.location;
