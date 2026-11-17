@@ -31,8 +31,8 @@ export function Privacy() {
       <p>
         The site runs on Cloudflare. For requests that reach our server code, Cloudflare records request metadata, including your IP
         address, and keeps it for 3 days (7 days from 1 December 2026). We cannot turn that off. The log line our own code writes holds only
-        the kind of request, the result, whether it was cached and how long it took: no IP address and no headers. The page also loads its
-        fonts from Google Fonts, so your browser contacts Google to fetch them.
+        the kind of request, the result, whether it was cached and how long it took: no IP address and no headers. Fonts are served from this site, so your
+        browser contacts no third party.
       </p>
 
       <h2>Contact</h2>

@@ -16,7 +16,7 @@
 - **Manual / paste entry.** Enter or paste standings and pairings when Melee
   data is unavailable or the event is not on Melee.
 - PNG app icons (180, 192, 512) for the PWA manifest.
-- ~~Privacy statement~~ Done: the `/privacy` page (linked from the footer) covers local storage, caching, Cloudflare log retention and Google Fonts. Keep it in sync with the code when any of that changes.
+- ~~Privacy statement~~ Done: the `/privacy` page (linked from the footer) covers local storage, caching, Cloudflare log retention and self-hosted fonts (no third-party requests). Keep it in sync with the code when any of that changes.
 - Deploy to Cloudflare Workers (free plan; see `docs/free-tier.md`).
 
 ## Out of scope for now
