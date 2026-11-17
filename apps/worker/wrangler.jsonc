@@ -3,6 +3,8 @@
   "name": "swu-tcc",
   "main": "src/index.ts",
   "compatibility_date": "2026-08-01",
+  // No Wrangler usage telemetry, for every run (local, CI, Workers Builds).
+  "send_metrics": false,
   // Static files are served by Workers static assets (free, unmetered). Only /api/* runs the Worker.
   "assets": {
     "directory": "../web/dist",
