@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/wavemoran/swu-tcc/compare/v1.1.0...v1.2.0) (2026-11-17)
+
+
+### Features
+
+* **worker:** limit upstream fetches to Melee, coalesce misses, cache not-found ([#11](https://github.com/wavemoran/swu-tcc/issues/11)) ([e14dca7](https://github.com/wavemoran/swu-tcc/commit/e14dca7afe5ca4fd44b68160ad5e730805f77f48))
+
 ## [1.1.0](https://github.com/wavemoran/swu-tcc/compare/v1.0.1...v1.1.0) (2026-11-17)
 
 
