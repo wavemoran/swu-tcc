@@ -39,6 +39,7 @@ node --experimental-strip-types tools/capture-melee-api.ts <tournamentId>
 ```
 
 See `docs/melee-api-switchover.md` for the credentials switch-over.
+Deploys: `docs/deploy.md` (Workers Builds on every push to `main`; manual fallback).
 
 npm 11 gates dependency install scripts. The `allowScripts` map in the root
 `package.json` approves exactly `esbuild` and `workerd` (their postinstalls
