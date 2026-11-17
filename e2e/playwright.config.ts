@@ -34,7 +34,7 @@ export default defineConfig({
     },
     {
       // Serves apps/web/dist (build it first: `npm run e2e` at the repo root does) plus the proxy.
-      command: `npx wrangler dev --ip 127.0.0.1 --port ${APP_PORT} --var MELEE_ORIGIN:${FAKE_ORIGIN} --persist-to ${persist}`,
+      command: `npx wrangler dev --ip 127.0.0.1 --port ${APP_PORT} --var MELEE_ORIGIN:${FAKE_ORIGIN} --var TCC_NO_UPSTREAM_LIMITS:1 --persist-to ${persist}`,
       cwd: '../apps/worker',
       // A bad id answers 400 from the worker, which proves it is up.
       url: `${APP_ORIGIN}/api/tournaments/not-a-number`,

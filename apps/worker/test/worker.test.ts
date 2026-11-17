@@ -9,7 +9,7 @@ import { decodeEntities, parseTournamentPage, resolveOrigin, roundKind } from '.
 import golden from './tournament-page.golden.json';
 import { createApp, roundTtl, type Env } from '../src/app';
 import { USER_AGENT, parseId } from '../src/melee';
-import { createLimiter } from '../src/ratelimit';
+import { createLimiter, memoryBinding, type RateLimitBinding } from '../src/ratelimit';
 
 const JSON_HDR = { 'content-type': 'application/json; charset=utf-8' };
 const HTML_HDR = { 'content-type': 'text/html; charset=utf-8' };
@@ -385,6 +385,7 @@ describe('x-tcc-nocache staging bypass', () => {
   });
   it('wrangler.jsonc does not define TCC_STAGING', async () => {
     expect(wranglerConfig).not.toContain('TCC_STAGING');
+    expect(wranglerConfig).not.toContain('TCC_NO_UPSTREAM_LIMITS');
   });
 });
 
@@ -480,5 +481,187 @@ describe('compressed round passthrough', () => {
     const raw = await again.arrayBuffer();
     expect([again.headers.get('content-encoding'), raw.byteLength, packed.byteLength]).toEqual(['gzip', packed.byteLength, packed.byteLength]);
     expect(await gunzip(raw)).toBe(matches);
+  });
+});
+
+describe('per-IP backstop', () => {
+  it('allows 600 requests a minute per IP and refuses the 601st', async () => {
+    const app = createApp();
+    const ip = { 'cf-connecting-ip': '198.51.100.99' };
+    for (let i = 0; i < 600; i++) {
+      const res = await app.request('/api/tournaments/abc', { headers: ip }, { TCC_DISABLED: '0' } as Env);
+      expect(res.status).toBe(400);
+    }
+    const res = await app.request('/api/tournaments/abc', { headers: ip }, { TCC_DISABLED: '0' } as Env);
+    expect(res.status).toBe(429);
+  });
+});
+
+describe('upstream limits (cache misses only)', () => {
+  const spy = (limit: number): RateLimitBinding & { calls: { key: string; delta?: number }[] } => {
+    const inner = memoryBinding(limit, 60_000);
+    const calls: { key: string; delta?: number }[] = [];
+    return { calls, limit: (o) => (calls.push(o), inner.limit(o)) };
+  };
+  const big = memoryBinding(1_000_000, 60_000);
+  const ip = (n: number) => ({ 'cf-connecting-ip': `192.0.2.${n}` });
+
+  it('refuses a client after its limit, with retry-after 60 and no further upstream calls', async () => {
+    const app = createApp(undefined, { client: memoryBinding(3, 60_000), location: big });
+    for (let i = 0; i < 3; i++) expect((await call(app, `/api/rounds/${810000 + i}/matches`, {}, ip(1))).status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    const res = await call(app, '/api/rounds/810010/matches', {}, ip(1));
+    expect(res.status).toBe(429);
+    expect(res.headers.get('retry-after')).toBe('60');
+    expect(res.headers.get('cache-control')).toBe('no-store');
+    const body = (await res.json()) as ProxyError;
+    expect(body.error).toBe('rate_limited');
+    expect(body.message).toMatch(/last minute/);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    // A different client is fine, and the refusal was not cached.
+    expect((await call(app, '/api/rounds/810010/matches', {}, ip(2))).status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+  });
+
+  it('refuses everyone past the location limit, with retry-after 10', async () => {
+    const app = createApp(undefined, { client: big, location: memoryBinding(2, 10_000) });
+    expect((await call(app, '/api/rounds/820001/matches', {}, ip(1))).status).toBe(200);
+    expect((await call(app, '/api/rounds/820002/matches', {}, ip(2))).status).toBe(200);
+    const res = await call(app, '/api/rounds/820003/matches', {}, ip(3));
+    expect(res.status).toBe(429);
+    expect(res.headers.get('retry-after')).toBe('10');
+    expect(((await res.json()) as ProxyError).message).toMatch(/Lots of people/);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('never refuses cached hits, even past the limits', async () => {
+    const app = createApp(undefined, { client: memoryBinding(1, 60_000), location: memoryBinding(1, 10_000) });
+    expect((await call(app, '/api/rounds/830001/matches', {}, ip(1))).status).toBe(200);
+    for (let i = 0; i < 5; i++) expect((await call(app, '/api/rounds/830001/matches', {}, ip(1))).status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect((await call(app, '/api/rounds/830002/matches', {}, ip(1))).status).toBe(429);
+  });
+
+  it('charges 2 for a tournament miss and 1 for a round miss, client first, with the client ip', async () => {
+    const client = spy(100);
+    const location = spy(100);
+    const app = createApp(undefined, { client, location });
+    await call(app, '/api/tournaments/840001', {}, ip(5));
+    await call(app, '/api/rounds/840002/standings', {}, ip(5));
+    await call(app, '/api/rounds/840003/standings');
+    expect(client.calls).toEqual([
+      { key: '192.0.2.5', delta: 2 },
+      { key: '192.0.2.5', delta: 1 },
+      { key: 'unknown', delta: 1 },
+    ]);
+    expect(location.calls.map((c) => [c.key, c.delta])).toEqual([['melee', 2], ['melee', 1], ['melee', 1]]);
+  });
+
+  it('uses the env bindings when present', async () => {
+    const client = spy(100);
+    const location = spy(100);
+    await call(createApp(), '/api/rounds/850001/matches', { MELEE_CLIENT_LIMIT: client, MELEE_LOCATION_LIMIT: location });
+    expect(client.calls).toHaveLength(1);
+    expect(location.calls).toHaveLength(1);
+  });
+
+  it('wrangler.jsonc configures both bindings', () => {
+    expect(wranglerConfig).toContain('"MELEE_LOCATION_LIMIT"');
+    expect(wranglerConfig).toContain('"MELEE_CLIENT_LIMIT"');
+  });
+});
+
+describe('coalescing concurrent misses', () => {
+  it('shares one upstream fetch and one limiter charge among concurrent identical requests', async () => {
+    let release!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    fetchMock = vi.fn(async () => {
+      await gate;
+      return new Response(standings, { headers: JSON_HDR });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    const charges: number[] = [];
+    const client: RateLimitBinding = { limit: async (o) => (charges.push(o.delta ?? 1), { success: true }) };
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      const app = createApp(undefined, { client });
+      const all = Promise.all(Array.from({ length: 5 }, () => call(app, '/api/rounds/860001/standings')));
+      await new Promise((r) => setTimeout(r, 20));
+      release();
+      const res = await all;
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(charges).toEqual([1]);
+      for (const r of res) expect(await r.text()).toBe(standings);
+      const caches = log.mock.calls.map((c) => JSON.parse(String(c[0])).cache).sort();
+      expect(caches).toEqual(['coalesced', 'coalesced', 'coalesced', 'coalesced', 'miss']);
+    } finally {
+      log.mockRestore();
+    }
+  });
+
+  it('keeps the compressed passthrough for every waiter', async () => {
+    const packed = new Uint8Array(await new Response(new Blob([standings]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer());
+    let release!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    fetchMock = vi.fn(async () => {
+      await gate;
+      return new Response(packed, { headers: { ...JSON_HDR, 'content-encoding': 'gzip' } });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    const app = createApp();
+    const all = Promise.all(Array.from({ length: 4 }, () => call(app, '/api/rounds/860002/standings')));
+    await new Promise((r) => setTimeout(r, 20));
+    release();
+    const res = await all;
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    for (const r of res) {
+      expect(r.headers.get('content-encoding')).toBe('gzip');
+      expect(new Uint8Array(await r.arrayBuffer())).toEqual(packed);
+    }
+  });
+
+  it('propagates an upstream error to every waiter and then forgets it', async () => {
+    let release!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    fetchMock = vi.fn(async () => {
+      await gate;
+      return new Response('x', { status: 500 });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    const app = createApp();
+    const all = Promise.all(Array.from({ length: 3 }, () => call(app, '/api/rounds/860003/standings')));
+    await new Promise((r) => setTimeout(r, 20));
+    release();
+    for (const r of await all) expect(r.status).toBe(502);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect((await call(app, '/api/rounds/860003/standings')).status).toBe(502);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('not-found caching', () => {
+  it('caches a Melee 404 for 10 minutes, with the same status and body', async () => {
+    mockUpstream(() => new Response('missing', { status: 404 }));
+    const app = createApp();
+    const first = await call(app, '/api/rounds/870001/matches');
+    const firstBody = (await first.json()) as ProxyError;
+    expect(first.status).toBe(404);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const second = await call(app, '/api/rounds/870001/matches');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(second.status).toBe(404);
+    expect(second.headers.get('cache-control')).toBe('public, max-age=600');
+    expect(await second.json()).toEqual(firstBody);
+    expect(firstBody.error).toBe('not_found');
+  });
+
+  it('does not cache 500 or 403', async () => {
+    for (const [status, id] of [[500, 870002], [403, 870003]] as const) {
+      mockUpstream(() => new Response('x', { status }));
+      const app = createApp();
+      await call(app, `/api/rounds/${id}/matches`);
+      await call(app, `/api/rounds/${id}/matches`);
+      expect(fetchMock, String(status)).toHaveBeenCalledTimes(2);
+    }
   });
 });
