@@ -48,7 +48,7 @@ shows live requests, CPU time and the structured `evt: api` log line.
 
 ## WAF flood rule (owner, dashboard)
 
-Create once in the Cloudflare dashboard for the `swu-tcc.win` zone: Security -> WAF -> Rate limiting rules -> Create rule.
+Create once in the Cloudflare dashboard: Domains -> `swu-tcc.win` -> Security -> Security rules -> Create rule -> Rate limiting rules (search "Security rules" with Cmd+K if the menu differs). Select Deploy, not Save as Draft.
 
 | Field | Value |
 |---|---|
