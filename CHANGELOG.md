@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/wavemoran/swu-tcc/compare/v1.2.0...v1.2.1) (2026-11-24)
+
+
+### Documentation
+
+* fix the dashboard path to the WAF rate limiting rule ([#13](https://github.com/wavemoran/swu-tcc/issues/13)) ([23e6f8b](https://github.com/wavemoran/swu-tcc/commit/23e6f8b3fe6bad207e1acfb8814352a0bfc6a44d))
+
 ## [1.2.0](https://github.com/wavemoran/swu-tcc/compare/v1.1.0...v1.2.0) (2026-11-17)
 
 
